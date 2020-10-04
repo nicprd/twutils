@@ -1,3 +1,4 @@
+from scipy.stats.mstats import gmean
 
 def tag2words(word,model):
     """
@@ -22,6 +23,14 @@ def tag2words(word,model):
             
     return paths[1:] if len(paths) > 1  else paths
 
+def most_probable_combo(words,wordc):
+    """
+    Replace taglist by the more probable combination of words
+    """
+    #we dont want 0 use words and we prefer short number of words
+    order = [-gmean([wordc[i] for i in w])/(len(w)**2) for w in words]
+
+    return " ".join(words[np.argsort(order)[0]])
 
 if __name__ == "__main__":
 
@@ -32,4 +41,4 @@ if __name__ == "__main__":
             "fiesta": 1,
             }
 
-    print(tag2words(sys.argv[1],model))
+    print(most_probable_combo(tag2words(sys.argv[1],model)))
