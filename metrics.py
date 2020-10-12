@@ -15,8 +15,8 @@ class logger(Callback):
         self.test_ev = np.empty((0,2))
 
     def on_epoch_end(self,epoch,logs={}):
-        tpred = self.model.predict(self.training[0]).round()
-        epred = self.model.predict(self.test[0]).round()
+        tpred = self.model.predict(self.training[0]).round().astype(int)
+        epred = self.model.predict(self.test[0]).round().astype(int)
 
         trep = classification_report(tpred,self.training[1],output_dict=True)
         erep = classification_report(epred,self.test[1],output_dict=True)
