@@ -11,8 +11,8 @@ class logger(Callback):
         self.training = training
         self.test = test
 
-        self.training_ev = []
-        self.test_ev = []
+        self.training_ev = np.empty((0,2))
+        self.test_ev = np.empty((0,2))
 
     def on_epoch_end(self,epoch,logs={}):
         tpred = self.model.predict(self.training[0]).round()
@@ -21,8 +21,8 @@ class logger(Callback):
         trep = classification_report(tpred,self.training[1],output_dict=True)
         erep = classification_report(epred,self.test[1],output_dict=True)
 
-        self.training_ev.append([epoch,trep["macro avg"]["f1-score"]])
-        self.test_ev.append([epoch,erep["macro avg"]["f1-score"]])
+        self.training_ev = np.vstack((self.training_ev,[epoch,trep["macro avg"]["f1-score"]]))
+        self.test_ev = np.vstack((self.test_ev,[epoch,erep["macro avg"]["f1-score"]]))
 
         print(f"[{epoch}]training score: {self.training_ev[-1][1]:.2f}%; ev score {self.test_ev[-1][1]:.2f}")
     
@@ -30,10 +30,11 @@ class logger(Callback):
 
         fig, ax = plt.subplots()
 
-        ax.plot( (tr:=np.array(self.training_ev))[:,0],
-                 tr[:,1])
-        ax.plot( (ev:=np.array(self.test_ev))[:,0],
-                 ev[:,1])
+        ax.plot( self.training_ev[:,0],
+                 self.training_ev[:,1])
+
+        ax.plot( self.test_ev[:,0],
+                 self.test_ev[:,1])
 
         ax.set( title = "evolución de f1" ) 
 
